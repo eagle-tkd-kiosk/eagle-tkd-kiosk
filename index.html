@@ -1,12 +1,305 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Eagle TKD Kiosk</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Eagle TKD Kiosk</title>
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- Minimal styles (Tailwind CDN for quick styling) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React 18 (CDN, no build needed) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel: allow JSX directly in browser (simple & fine for kiosk) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+  <div id="root" class="p-4 md:p-8"></div>
+
+  <script type="text/babel">
+    const {useState, useMemo, useRef, useEffect} = React;
+
+    const SECTIONS = [
+      { id: "trial", labelEN: "2-Week Trial Program" },
+      { id: "what", labelEN: "What is Taekwondo?" },
+      { id: "adv",  labelEN: "Eagle TKD Advantage" },
+      { id: "faq",  labelEN: "FAQ" },
+      { id: "enroll", labelEN: "Enroll / Pay" },
+      { id: "contact", labelEN: "Inquiry" },
+    ];
+
+    const copy = {
+      headline: "Welcome to Master Son’s Eagle Taekwondo",
+      sub: "Tap a tile to learn more",
+      trial: {
+        title: "About the 2-Week Trial Program",
+        bullets: [
+          "Duration: 2 weeks / 4 lessons (2x per week)",
+          "Ages: 4+ Kids, Teens, Adults",
+          "Tuition: $49 (includes uniform)",
+          "Perks: Level check, posture & focus report",
+        ],
+        script:
+          "Experience our culture and teaching style. Students learn etiquette, focus, confidence, and fundamentals in a safe, fun class.",
+      },
+      what: {
+        title: "What is Taekwondo?",
+        p: "Taekwondo develops body and mind—respect, perseverance, and self-control—while building flexibility, core strength, and confidence.",
+        points: [
+          "Character: respect & discipline",
+          "Physical: flexibility, strength, coordination",
+          "Mindset: confidence & focus",
+        ],
+      },
+      adv: {
+        title: "Why Choose Eagle TKD",
+        items: [
+          { h: "Personalized Coaching", d: "Goals-based feedback for confidence, fitness, and competition" },
+          { h: "AI Feedback", d: "Video-based posture checks & simple progress reports" },
+          { h: "Safety First", d: "Stepwise curriculum & injury-prevention warmups" },
+          { h: "Home Partnership", d: "Reward charts and take-home practice cards" },
+        ],
+      },
+      faq: {
+        qa: [
+          { q: "Can beginners join?", a: "Absolutely. We start from the basics by age and level." },
+          { q: "Can parents watch?", a: "Yes—especially recommended for the first class." },
+          { q: "Do I need a uniform?", a: "A free uniform is included with the trial." },
+          { q: "How do I book?", a: "Use the QR code, call, text, or email." },
+        ],
+      },
+      enroll: {
+        title: "Enroll / Pay",
+        productTitle: "2-Week Trial Program",
+        price: "$49 (uniform included)",
+        fields: {
+          guardian: "Guardian Name",
+          student: "Student Name",
+          age: "Age",
+          phone: "Phone",
+          email: "Email",
+          day: "Preferred Days (e.g., Mon/Wed)",
+          note: "Notes (optional)",
+          consent: "I agree to the collection and use of my personal information.",
+        },
+        pay: "Pay Now",
+        submit: "Submit Enrollment",
+        success: "Enrollment received! We'll text/email you after payment is complete.",
+      },
+      contact: {
+        title: "Inquiry",
+        lead: "Leave a quick message and we’ll reply shortly.",
+        address: "Master Son’s Eagle Taekwondo, Chester Springs, PA",
+      },
+    };
+
+    function Section({title, children, actions}) {
+      return (
+        <div className="bg-white border rounded-2xl shadow-sm">
+          <div className="p-4 md:p-6 border-b flex items-center justify-between">
+            <h3 className="font-semibold text-xl md:text-2xl">{title}</h3>
+            {actions}
+          </div>
+          <div className="p-4 md:p-6">{children}</div>
+        </div>
+      );
+    }
+
+    function App(){
+      const [active, setActive] = useState("trial");
+      const [cart, setCart]   = useState([]);
+      const [form, setForm]   = useState({guardian:"",student:"",age:"",phone:"",email:"",day:"",note:"",consent:false});
+      const [submitted, setSubmitted] = useState(false);
+
+      const addTrialToCart = () => {
+        setCart([{ id:"trial-49", name: copy.enroll.productTitle, price:49, qty:1 }]);
+        setActive("enroll");
+      };
+
+      const cartTotal = cart.reduce((s, it)=>s + it.price * it.qty, 0);
+
+      return (
+        <div className="max-w-6xl mx-auto space-y-4">
+          {/* Header */}
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <h1 className="text-2xl md:text-4xl font-bold tracking-tight">{copy.headline}</h1>
+              <p className="opacity-70 mt-1">{copy.sub}</p>
+            </div>
+          </div>
+
+          {/* Tiles */}
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 md:gap-4">
+            {SECTIONS.map(s=>(
+              <button key={s.id}
+                      onClick={()=>setActive(s.id)}
+                      className={`rounded-2xl p-4 md:p-5 bg-white shadow-sm border text-left hover:shadow-md focus:outline-none focus:ring-4 ${active===s.id?'ring-2 ring-sky-400':''}`}>
+                <div className="text-lg md:text-xl font-semibold">{s.labelEN}</div>
+                <div className="text-xs opacity-60 mt-1">Tap</div>
+              </button>
+            ))}
+          </div>
+
+          {/* Panels */}
+          {active==="trial" && (
+            <Section title={copy.trial.title}
+                     actions={<button className="rounded-2xl px-4 py-2 bg-slate-700 text-white" onClick={addTrialToCart}>Add</button>}>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <ul className="space-y-2">{copy.trial.bullets.map((b,i)=><li key={i}>• {b}</li>)}</ul>
+                  <p className="mt-4 leading-relaxed">{copy.trial.script}</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="aspect-video w-full rounded-2xl bg-slate-100 border grid place-items-center text-sm opacity-70">
+                    Trial highlights (sample video)
+                  </div>
+                </div>
+              </div>
+            </Section>
+          )}
+
+          {active==="what" && (
+            <Section title={copy.what.title}>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <p className="leading-relaxed">{copy.what.p}</p>
+                  <ul className="mt-4 space-y-2">{copy.what.points.map((b,i)=><li key={i}>• {b}</li>)}</ul>
+                </div>
+                <div className="aspect-video w-full rounded-2xl bg-slate-100 border grid place-items-center text-sm opacity-70">
+                  Fundamentals (sample)
+                </div>
+              </div>
+            </Section>
+          )}
+
+          {active==="adv" && (
+            <Section title={copy.adv.title}>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid gap-3">
+                  {copy.adv.items.map((it,i)=>(
+                    <div key={i} className="p-4 rounded-2xl bg-slate-50 border">
+                      <div className="font-semibold">{it.h}</div>
+                      <div className="opacity-80 text-sm mt-1">{it.d}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="aspect-video w-full rounded-2xl bg-slate-100 border grid place-items-center text-sm opacity-70">
+                  Class snapshots (sample)
+                </div>
+              </div>
+            </Section>
+          )}
+
+          {active==="faq" && (
+            <Section title="FAQ">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  {copy.faq.qa.map((qa, idx)=>(
+                    <div key={idx} className="p-4 rounded-2xl bg-white border shadow-sm">
+                      <div className="font-semibold">Q. {qa.q}</div>
+                      <div className="opacity-80 mt-1">A. {qa.a}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="aspect-video w-full rounded-2xl bg-slate-100 border grid place-items-center text-sm opacity-70">
+                  First-visit guide (sample)
+                </div>
+              </div>
+            </Section>
+          )}
+
+          {active==="enroll" && (
+            <Section title={copy.enroll.title}>
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 space-y-4">
+                  <div className="p-4 rounded-2xl bg-slate-50 border flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold">{copy.enroll.productTitle}</div>
+                      <div className="text-sm opacity-80">{copy.enroll.price}</div>
+                    </div>
+                    <button className="rounded-2xl px-4 py-2 bg-slate-900 text-white" onClick={addTrialToCart}>Add</button>
+                  </div>
+
+                  <form className="grid grid-cols-1 md:grid-cols-2 gap-3" onSubmit={e=>{e.preventDefault(); if(!form.consent) return alert('Please accept the consent.'); setSubmitted(true);}}>
+                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.guardian} value={form.guardian} onChange={e=>setForm({...form, guardian:e.target.value})}/>
+                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.student}  value={form.student}  onChange={e=>setForm({...form, student:e.target.value})}/>
+                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.age}      value={form.age}      onChange={e=>setForm({...form, age:e.target.value})}/>
+                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.phone}    value={form.phone}    onChange={e=>setForm({...form, phone:e.target.value})}/>
+                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.email}    value={form.email}    onChange={e=>setForm({...form, email:e.target.value})}/>
+                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.day}      value={form.day}      onChange={e=>setForm({...form, day:e.target.value})}/>
+                    <textarea className="border rounded-xl p-3 md:col-span-2" placeholder={copy.enroll.fields.note} value={form.note} onChange={e=>setForm({...form, note:e.target.value})}></textarea>
+                    <label className="flex items-center gap-2 text-sm md:col-span-2">
+                      <input type="checkbox" checked={form.consent} onChange={e=>setForm({...form, consent:e.target.checked})}/>
+                      {copy.enroll.fields.consent}
+                    </label>
+                    <div className="flex gap-3 md:col-span-2">
+                      <button type="submit" className="rounded-2xl px-4 py-2 bg-slate-700 text-white">{copy.enroll.submit}</button>
+                      <a href="PAYMENT_LINK_HERE" target="_blank" className="rounded-2xl px-4 py-2 bg-slate-900 text-white"> {copy.enroll.pay} </a>
+                    </div>
+                  </form>
+
+                  {submitted && (
+                    <div className="p-4 rounded-2xl bg-emerald-50 border text-emerald-700">
+                      {copy.enroll.success}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <div className="aspect-video w-full rounded-2xl bg-slate-100 border grid place-items-center text-sm opacity-70">
+                    Intro video (sample)
+                  </div>
+                  <div className="p-4 rounded-2xl bg-slate-50 border text-sm opacity-80">
+                    Payment button opens Stripe Checkout. Replace with your live link.
+                  </div>
+                </div>
+              </div>
+            </Section>
+          )}
+
+          {active==="contact" && (
+            <Section title={copy.contact.title}>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="col-span-2 space-y-3">
+                  <p className="leading-relaxed">{copy.contact.lead}</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <a href="tel:+14842027808" className="rounded-2xl px-4 py-2 bg-slate-900 text-white text-center">Call</a>
+                    <a href="sms:+14847736282" className="rounded-2xl px-4 py-2 bg-slate-700 text-white text-center">Text</a>
+                    <a href="mailto:eagletkd2017@gmail.com" className="rounded-2xl px-4 py-2 border text-center">Email</a>
+                    <a href="#" onclick="alert('Scan the QR to open the online enrollment page. (Sample)'); return false;" className="rounded-2xl px-4 py-2 border text-center">QR</a>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-slate-50 border">
+                    <div className="font-semibold mb-1">Address</div>
+                    <div className="opacity-80">{copy.contact.address}</div>
+                  </div>
+                </div>
+                <div className="col-span-1">
+                  <div className="aspect-video w-full rounded-2xl bg-white border grid place-items-center text-sm opacity-70">
+                    QR CODE HERE
+                  </div>
+                  <p className="text-xs opacity-70 mt-2">Place your QR image here.</p>
+                </div>
+              </div>
+            </Section>
+          )}
+
+          {/* Footer */}
+          <div className="pt-2 flex flex-wrap items-center justify-between gap-3 opacity-80">
+            <div className="text-xs">© {new Date().getFullYear()} Master Son’s Eagle Taekwondo</div>
+            <div className="text-xs">Enroll & pay when ready</div>
+            {cart.length>0 && (
+              <div className="text-xs p-2 rounded-xl bg-white border shadow-sm">
+                Cart: {cart[0].name} — $ {cartTotal.toFixed(2)}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
 </html>
