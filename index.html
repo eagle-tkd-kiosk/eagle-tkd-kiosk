@@ -10,44 +10,29 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: { 500:'#3a83ff', 600:'#2467e6', 700:'#1c53b8', 800:'#163f8a' }
-          }
-        }
-      }
+      theme:{ extend:{ colors:{ brand:{500:'#3a83ff',600:'#2467e6',700:'#1c53b8',800:'#163f8a'} } } }
     }
   </script>
 
-  <!-- React (CDN) + Babel -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- React + Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
-    .glass{ backdrop-filter: blur(10px); background: rgba(255,255,255,.65); }
+    .glass{ backdrop-filter: blur(10px); background: rgba(255,255,255,.65) }
     .glass-card{ backdrop-filter: blur(12px); background: rgba(255,255,255,.55); border:1px solid rgba(255,255,255,.6) }
     .soft-shadow{ box-shadow: 0 10px 30px rgba(16,24,40,.1) }
-    .reveal{ opacity:0; transform: translateY(12px); transition: all .5s ease; }
-    .reveal.on{ opacity:1; transform: none; }
     .tile{ transition: transform .15s ease, box-shadow .2s ease }
     .tile:hover{ transform: translateY(-2px) }
-    .ripple{ position: relative; overflow: hidden; }
-    .ripple:after{ content:""; position:absolute; inset:0; transform:scale(0);
-      background: radial-gradient(circle, rgba(255,255,255,.4) 12%, transparent 13%) center/10px 10px; opacity:0;
-      transition: transform .5s, opacity .6s }
-    .ripple:active:after{ transform:scale(10); opacity:1; transition:0s }
   </style>
 </head>
 <body class="min-h-screen bg-slate-50">
-
   <main id="root" class="min-h-screen"></main>
 
   <script type="text/babel">
     const {useState, useEffect} = React;
 
-    /* ----------------- CONTENT ----------------- */
     const SECTIONS = [
       { id:"trial",  label:"2-Week Trial" },
       { id:"what",   label:"What is Taekwondo?" },
@@ -60,61 +45,41 @@
     const copy = {
       headline: "Welcome to Master Son’s Eagle Taekwondo",
       sub: "Tap a button below to explore. You can enroll and pay on the spot.",
-      trial: {
-        title: "About the 2-Week Trial Program",
-        bullets: [
+      trial: { title:"About the 2-Week Trial Program",
+        bullets:[
           "Duration: 2 weeks / 4 lessons (2x per week)",
           "Ages: 4+ Kids, Teens, Adults",
           "Tuition: $49 (uniform included)",
           "Perks: Level check, posture & focus report",
         ],
-        script:
-          "Experience our culture and teaching style. Students learn etiquette, focus, confidence, and fundamentals in a safe, fun class.",
+        script:"Experience our culture and teaching style. Students learn etiquette, focus, confidence, and fundamentals in a safe, fun class."
       },
-      what: {
-        title: "What is Taekwondo?",
-        p: "Taekwondo develops body and mind—respect, perseverance, and self-control—while building flexibility, core strength, and confidence.",
-        points: [
-          "Character: respect & discipline",
-          "Physical: flexibility, strength, coordination",
-          "Mindset: confidence & focus",
-        ],
+      what:{ title:"What is Taekwondo?",
+        p:"Taekwondo develops body and mind—respect, perseverance, and self-control—while building flexibility, core strength, and confidence.",
+        points:["Character: respect & discipline","Physical: flexibility, strength, coordination","Mindset: confidence & focus"]
       },
-      adv: {
-        title: "Why Choose Eagle TKD",
-        items: [
-          { h: "Personalized Coaching", d: "Goals-based feedback for confidence, fitness, and competition" },
-          { h: "AI Feedback", d: "Video-based posture checks & simple progress reports" },
-          { h: "Safety First", d: "Stepwise curriculum & injury-prevention warmups" },
-          { h: "Home Partnership", d: "Reward charts and take-home practice cards" },
-        ],
+      adv:{ title:"Why Choose Eagle TKD",
+        items:[
+          {h:"Personalized Coaching",d:"Goals-based feedback for confidence, fitness, and competition"},
+          {h:"AI Feedback",d:"Video-based posture checks & simple progress reports"},
+          {h:"Safety First",d:"Stepwise curriculum & injury-prevention warmups"},
+          {h:"Home Partnership",d:"Reward charts and take-home practice cards"},
+        ]
       },
-      faq: {
-        qa: [
-          { q: "Can beginners join?", a: "Absolutely. We start from the basics by age and level." },
-          { q: "Can parents watch?", a: "Yes—especially recommended for the first class." },
-          { q: "Do I need a uniform?", a: "A free uniform is included with the trial." },
-          { q: "How do I book?", a: "Use the QR code, call, text, or email." },
-        ],
+      faq:{ qa:[
+        {q:"Can beginners join?",a:"Absolutely. We start from the basics by age and level."},
+        {q:"Can parents watch?",a:"Yes—especially recommended for the first class."},
+        {q:"Do I need a uniform?",a:"A free uniform is included with the trial."},
+        {q:"How do I book?",a:"Use the QR code, call, text, or email."},
+      ]},
+      enroll:{ title:"Enroll / Pay", productTitle:"2-Week Trial Program", price:"$49 (uniform included)",
+        pay:"Pay Now", submit:"Submit Enrollment", success:"Enrollment received! We'll text/email you after payment is complete."
       },
-      enroll: {
-        title: "Enroll / Pay",
-        productTitle: "2-Week Trial Program",
-        price: "$49 (uniform included)",
-        pay: "Pay Now",
-        submit: "Submit Enrollment",
-        success: "Enrollment received! We'll text/email you after payment is complete.",
-      },
-      contact: {
-        title: "Inquiry",
-        lead: "Leave a quick message and we’ll reply shortly.",
-        address: "Master Son’s Eagle Taekwondo, Chester Springs, PA",
-      },
+      contact:{ title:"Inquiry", lead:"Leave a quick message and we’ll reply shortly.", address:"Master Son’s Eagle Taekwondo, Chester Springs, PA" },
     };
 
-    /* ----------------- SMALL UI ----------------- */
     const Card = ({title, right, children}) => (
-      <section className="reveal rounded-3xl glass-card soft-shadow border border-white/70">
+      <section className="rounded-3xl glass-card soft-shadow border border-white/70">
         <div className="p-4 md:p-6 border-b border-white/60 flex items-center justify-between">
           <h3 className="font-semibold text-xl md:text-2xl">{title}</h3>
           <div className="flex items-center gap-2">{right}</div>
@@ -123,7 +88,7 @@
       </section>
     );
     const Btn = ({as="button", kind="primary", className="", ...props})=>{
-      const base = "px-4 py-3 rounded-2xl text-base font-semibold ripple";
+      const base = "px-4 py-3 rounded-2xl text-base font-semibold";
       const styles = {
         primary: "bg-brand-600 hover:bg-brand-700 text-white",
         secondary:"bg-slate-900/90 hover:bg-slate-900 text-white",
@@ -139,49 +104,48 @@
       </div>
     );
 
-    function useReveal(){
-      useEffect(()=>{
-        const io = new IntersectionObserver((ents)=>ents.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')}),{threshold:.12});
-        document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
-        return ()=>io.disconnect();
-      },[]);
-    }
-
-    /* ----------------- APP ----------------- */
     function App(){
-      useReveal();
+      const [active,setActive]=useState("home");
+      const [form,setForm]=useState({guardian:"",student:"",age:"",phone:"",email:"",day:"",note:"",consent:false});
+      const [submitted,setSubmitted]=useState(false);
+      const [cart,setCart]=useState([]);
+      const [logoOk,setLogoOk]=useState(true);
+      const [heroOk,setHeroOk]=useState(true);
 
-      // 'home' = 메인 스플래시 화면
-      const [active, setActive] = useState("home");
-      const [form, setForm] = useState({guardian:"",student:"",age:"",phone:"",email:"",day:"",note:"",consent:false});
-      const [submitted, setSubmitted] = useState(false);
-      const [cart, setCart] = useState([]);
-
-      const addTrial = ()=>{ setCart([{id:"trial-49",name:copy.enroll.productTitle,price:49,qty:1}]); setActive("enroll"); };
-      const cartTotal = cart.reduce((s,it)=>s+it.price*it.qty,0);
+      const addTrial=()=>{ setCart([{id:"trial-49",name:copy.enroll.productTitle,price:49,qty:1}]); setActive("enroll"); };
+      const cartTotal=cart.reduce((s,it)=>s+it.price*it.qty,0);
 
       return (
         <div className="min-h-screen">
-          {/* ---------- HOME / SPLASH ---------- */}
+
+          {/* HOME (Splash) */}
           {active==="home" && (
             <section className="relative min-h-[88vh] md:min-h-[92vh] overflow-hidden">
-              <!-- 배경 사진 -->
-              <img src="/hero.jpg" alt="Taekwondo" className="absolute inset-0 h-full w-full object-cover" />
-              <!-- 어둡게 오버레이 -->
+              {/* 배경 이미지 */}
+              {heroOk ? (
+                <img src="/hero.jpg" alt="Taekwondo background"
+                     className="absolute inset-0 h-full w-full object-cover"
+                     onError={()=>setHeroOk(false)} />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-100" />
+              )}
               <div className="absolute inset-0 bg-slate-900/35"></div>
 
-              <!-- 중앙 로고 + 타이틀 -->
+              {/* 중앙 로고/문구 */}
               <div className="relative z-10 max-w-4xl mx-auto px-6 pt-20 md:pt-28 text-center text-white">
                 <div className="mx-auto h-24 w-24 md:h-28 md:w-28 rounded-3xl bg-white/10 border border-white/40 grid place-items-center shadow-lg mb-6">
-                  <!-- 로고 이미지 있으면 표시, 없으면 글자 E -->
-                  <img src="/logo.png" alt="Eagle TKD" className="h-16 w-16 object-contain" onError="this.style.display='none'"/>
-                  <span id="logoFallback" className="text-3xl font-extrabold">E</span>
+                  {logoOk ? (
+                    <img src="/logo.png" alt="Eagle TKD" className="h-16 w-16 object-contain"
+                         onError={()=>setLogoOk(false)} />
+                  ) : (
+                    <span className="text-3xl font-extrabold">E</span>
+                  )}
                 </div>
                 <h1 className="text-3xl md:text-5xl font-extrabold drop-shadow-lg">{copy.headline}</h1>
                 <p className="mt-3 text-sm md:text-base text-white/85">{copy.sub}</p>
               </div>
 
-              <!-- 하단 고정 버튼 바 -->
+              {/* 하단 버튼 바 */}
               <div className="absolute left-0 right-0 bottom-0 pb-6">
                 <div className="max-w-4xl mx-auto px-6">
                   <div className="glass soft-shadow rounded-3xl p-3 md:p-4 grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -194,7 +158,7 @@
             </section>
           )}
 
-          {/* ---------- QUICK MENU (홈 > More) ---------- */}
+          {/* QUICK MENU */}
           {active==="menu" && (
             <section className="px-4 md:px-8 py-8">
               <div className="max-w-6xl mx-auto space-y-6">
@@ -204,8 +168,7 @@
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-3 md:gap-4">
                   {SECTIONS.map(s=>(
-                    <button key={s.id}
-                      onClick={()=>setActive(s.id)}
+                    <button key={s.id} onClick={()=>setActive(s.id)}
                       className="tile rounded-2xl p-4 md:p-5 bg-white/90 border border-white/70 soft-shadow text-left hover:shadow-lg focus:outline-none focus:ring-4 ring-brand-300">
                       <div className="text-base md:text-lg font-semibold text-slate-800">{s.label}</div>
                       <div className="text-[11px] opacity-60 mt-1">Tap</div>
@@ -216,7 +179,7 @@
             </section>
           )}
 
-          {/* ---------- SECTIONS ---------- */}
+          {/* CONTENT SECTIONS */}
           <div className="px-4 md:px-8 py-8 max-w-6xl mx-auto space-y-6 md:space-y-8">
             {active==="trial" && (
               <Card title={copy.trial.title} right={<Btn kind="secondary" onClick={addTrial}>Add</Btn>}>
@@ -325,7 +288,7 @@
               <Card title="Inquiry">
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="col-span-2 space-y-3">
-                    <p className="leading-relaxed">{copy.contact.lead}</p>
+                    <p className="leading-relaxed">Leave a quick message and we’ll reply shortly.</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <Btn as="a" href="tel:+14842027808">Call</Btn>
                       <Btn kind="secondary" as="a" href="sms:+14847736282">Text</Btn>
@@ -334,7 +297,7 @@
                     </div>
                     <div className="p-4 rounded-2xl bg-white/95 border border-white/70">
                       <div className="font-semibold mb-1">Address</div>
-                      <div className="opacity-80">{copy.contact.address}</div>
+                      <div className="opacity-80">Master Son’s Eagle Taekwondo, Chester Springs, PA</div>
                     </div>
                   </div>
                   <div className="col-span-1">
@@ -354,7 +317,7 @@
               <div className="text-xs">© {new Date().getFullYear()} Master Son’s Eagle Taekwondo</div>
               <div className="text-xs">Enroll & pay when ready</div>
               {cart.length>0 && (
-                <div className="text-xs p-2 rounded-xl bg-white/90 border border-white/70 soft-shadow">
+                <div className="text-xs p-2 rounded-2xl bg-white/90 border border-white/70 soft-shadow">
                   Cart: {cart[0].name} — $ {cartTotal.toFixed(2)}
                 </div>
               )}
@@ -364,7 +327,7 @@
       );
     }
 
-    const input = (ph, key, form, setForm)=>(
+    const input = (ph,key,form,setForm)=>(
       <input className="border rounded-2xl p-3" placeholder={ph} value={form[key]||""} onChange={e=>setForm({...form,[key]:e.target.value})}/>
     );
 
