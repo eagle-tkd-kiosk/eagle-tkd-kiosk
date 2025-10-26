@@ -5,44 +5,94 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Eagle TKD Kiosk</title>
   <meta name="theme-color" content="#0f172a">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Minimal styles (Tailwind CDN for quick styling) -->
+  <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:'#eef6ff',100:'#d9ecff',200:'#b7d8ff',300:'#8fc0ff',400:'#62a2ff',
+              500:'#3a83ff',600:'#2467e6',700:'#1c53b8',800:'#163f8a',900:'#122f66'
+            }
+          }
+        }
+      }
+    }
+  </script>
 
-  <!-- React 18 (CDN, no build needed) -->
+  <!-- React (CDN) + Babel -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- Babel: allow JSX directly in browser (simple & fine for kiosk) -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root{ --glass: rgba(255,255,255,.65); --glass-b: rgba(255,255,255,.8) }
+    body{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; }
+    .glass { backdrop-filter: blur(10px); background: var(--glass); }
+    .glass-card { backdrop-filter: blur(12px); background: rgba(255,255,255,.55); border:1px solid rgba(255,255,255,.6) }
+    .tile:hover{ transform: translateY(-2px); }
+    .tile:active{ transform: translateY(0); }
+    .soft-shadow{ box-shadow: 0 10px 30px rgba(16,24,40,.08) }
+    .bg-hero{
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,.25), transparent 60%),
+        radial-gradient(1000px 500px at 90% -5%, rgba(56,189,248,.25), transparent 55%),
+        linear-gradient(135deg, #f8fafc 0%, #eef2ff 25%, #ecfeff 60%, #f1f5f9 100%);
+    }
+  </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-  <div id="root" class="p-4 md:p-8"></div>
+<body class="min-h-screen bg-hero">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40">
+    <div class="glass soft-shadow border-b border-white/50">
+      <div class="max-w-6xl mx-auto px-4 md:px-8 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-sky-400 to-brand-600 grid place-items-center text-white font-extrabold shadow-md">E</div>
+          <div>
+            <h1 class="text-lg md:text-xl font-bold tracking-tight text-slate-800">Master Son’s Eagle Taekwondo</h1>
+            <p class="text-xs text-slate-500 -mt-0.5">Touch Kiosk</p>
+          </div>
+        </div>
+        <a href="tel:+14842027808" class="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold soft-shadow">
+          <svg width="16" height="16" viewBox="0 0 24 24" class="fill-current"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.56.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h2.5a1 1 0 011 1 11.36 11.36 0 00.57 3.56 1 1 0 01-.24 1.01l-2.21 2.22z"/></svg>
+          Call
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="root" class="px-4 md:px-8 py-6 md:py-10"></main>
 
   <script type="text/babel">
-    const {useState, useMemo, useRef, useEffect} = React;
+    const {useState} = React;
 
     const SECTIONS = [
-      { id: "trial", labelEN: "2-Week Trial Program" },
-      { id: "what", labelEN: "What is Taekwondo?" },
-      { id: "adv",  labelEN: "Eagle TKD Advantage" },
-      { id: "faq",  labelEN: "FAQ" },
-      { id: "enroll", labelEN: "Enroll / Pay" },
-      { id: "contact", labelEN: "Inquiry" },
+      { id: "trial",  label: "2-Week Trial",       icon: TrialIcon },
+      { id: "what",   label: "What is Taekwondo?", icon: SunIcon },
+      { id: "adv",    label: "Eagle TKD Advantage",icon: ShieldIcon },
+      { id: "faq",    label: "FAQ",                icon: QIcon },
+      { id: "enroll", label: "Enroll / Pay",       icon: CardIcon },
+      { id: "contact",label: "Inquiry",            icon: ChatIcon }
     ];
 
     const copy = {
       headline: "Welcome to Master Son’s Eagle Taekwondo",
-      sub: "Tap a tile to learn more",
+      sub: "Tap a card to explore programs, watch a quick intro, and enroll on the spot.",
       trial: {
         title: "About the 2-Week Trial Program",
         bullets: [
           "Duration: 2 weeks / 4 lessons (2x per week)",
           "Ages: 4+ Kids, Teens, Adults",
-          "Tuition: $49 (includes uniform)",
+          "Tuition: $49 (uniform included)",
           "Perks: Level check, posture & focus report",
         ],
-        script:
-          "Experience our culture and teaching style. Students learn etiquette, focus, confidence, and fundamentals in a safe, fun class.",
+        script: "Experience our culture and teaching style. Students learn etiquette, focus, confidence, and fundamentals in a safe, fun class.",
       },
       what: {
         title: "What is Taekwondo?",
@@ -75,18 +125,12 @@
         productTitle: "2-Week Trial Program",
         price: "$49 (uniform included)",
         fields: {
-          guardian: "Guardian Name",
-          student: "Student Name",
-          age: "Age",
-          phone: "Phone",
-          email: "Email",
-          day: "Preferred Days (e.g., Mon/Wed)",
-          note: "Notes (optional)",
-          consent: "I agree to the collection and use of my personal information.",
+          guardian: "Guardian Name", student:"Student Name", age:"Age",
+          phone:"Phone", email:"Email", day:"Preferred Days (e.g., Mon/Wed)",
+          note:"Notes (optional)", consent:"I agree to the collection and use of my personal information."
         },
-        pay: "Pay Now",
-        submit: "Submit Enrollment",
-        success: "Enrollment received! We'll text/email you after payment is complete.",
+        pay:"Pay Now", submit:"Submit Enrollment",
+        success:"Enrollment received! We'll text/email you after payment is complete.",
       },
       contact: {
         title: "Inquiry",
@@ -95,211 +139,226 @@
       },
     };
 
-    function Section({title, children, actions}) {
-      return (
-        <div className="bg-white border rounded-2xl shadow-sm">
-          <div className="p-4 md:p-6 border-b flex items-center justify-between">
-            <h3 className="font-semibold text-xl md:text-2xl">{title}</h3>
-            {actions}
-          </div>
-          <div className="p-4 md:p-6">{children}</div>
-        </div>
-      );
-    }
-
-    function App(){
+    function Page() {
       const [active, setActive] = useState("trial");
-      const [cart, setCart]   = useState([]);
-      const [form, setForm]   = useState({guardian:"",student:"",age:"",phone:"",email:"",day:"",note:"",consent:false});
+      const [form, setForm] = useState({guardian:"",student:"",age:"",phone:"",email:"",day:"",note:"",consent:false});
       const [submitted, setSubmitted] = useState(false);
+      const [cart, setCart] = useState([]);
 
-      const addTrialToCart = () => {
-        setCart([{ id:"trial-49", name: copy.enroll.productTitle, price:49, qty:1 }]);
-        setActive("enroll");
-      };
-
-      const cartTotal = cart.reduce((s, it)=>s + it.price * it.qty, 0);
+      const addTrial = ()=>{ setCart([{id:"trial-49", name: copy.enroll.productTitle, price:49, qty:1}]); setActive("enroll"); };
+      const cartTotal = cart.reduce((s, it)=>s + it.price*it.qty, 0);
 
       return (
-        <div className="max-w-6xl mx-auto space-y-4">
-          {/* Header */}
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <h1 className="text-2xl md:text-4xl font-bold tracking-tight">{copy.headline}</h1>
-              <p className="opacity-70 mt-1">{copy.sub}</p>
+        <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
+          {/* Hero */}
+          <section className="rounded-3xl glass-card soft-shadow p-6 md:p-10">
+            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight text-slate-900">{copy.headline}</h2>
+            <p className="mt-2 text-slate-600">{copy.sub}</p>
+            <div className="mt-4 flex gap-3">
+              <a href="tel:+14842027808" className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold">Call</a>
+              <a href="sms:+14847736282" className="px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-900 text-white text-sm font-semibold">Text</a>
+              <a href="mailto:eagletkd2017@gmail.com" className="px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm font-semibold">Email</a>
             </div>
-          </div>
+          </section>
 
           {/* Tiles */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 md:gap-4">
-            {SECTIONS.map(s=>(
-              <button key={s.id}
-                      onClick={()=>setActive(s.id)}
-                      className={`rounded-2xl p-4 md:p-5 bg-white shadow-sm border text-left hover:shadow-md focus:outline-none focus:ring-4 ${active===s.id?'ring-2 ring-sky-400':''}`}>
-                <div className="text-lg md:text-xl font-semibold">{s.labelEN}</div>
-                <div className="text-xs opacity-60 mt-1">Tap</div>
+          <section className="grid grid-cols-2 md:grid-cols-6 gap-3 md:gap-4">
+            {SECTIONS.map(({id,label,icon:Icon})=>(
+              <button key={id} onClick={()=>setActive(id)}
+                className={`tile transition rounded-2xl p-4 md:p-5 bg-white/80 border border-white/70 soft-shadow text-left hover:shadow-lg focus:outline-none focus:ring-4 ring-brand-300 ${active===id?'ring-2':''}`}>
+                <div className="flex items-center gap-3">
+                  <span className="inline-grid place-items-center h-10 w-10 rounded-xl bg-gradient-to-br from-brand-400 to-brand-700 text-white shadow">
+                    <Icon />
+                  </span>
+                  <span className="text-base md:text-lg font-semibold text-slate-800">{label}</span>
+                </div>
+                <div className="text-[11px] opacity-60 mt-2">Tap to open</div>
               </button>
             ))}
-          </div>
+          </section>
 
           {/* Panels */}
           {active==="trial" && (
-            <Section title={copy.trial.title}
-                     actions={<button className="rounded-2xl px-4 py-2 bg-slate-700 text-white" onClick={addTrialToCart}>Add</button>}>
+            <Card title={copy.trial.title} right={<Primary onClick={addTrial}>Add</Primary>}>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <ul className="space-y-2">{copy.trial.bullets.map((b,i)=><li key={i}>• {b}</li>)}</ul>
-                  <p className="mt-4 leading-relaxed">{copy.trial.script}</p>
+                  <ul className="space-y-2 text-slate-700">{copy.trial.bullets.map((b,i)=><li key={i}>• {b}</li>)}</ul>
+                  <p className="mt-4 leading-relaxed text-slate-700">{copy.trial.script}</p>
                 </div>
-                <div className="space-y-2">
-                  <div className="aspect-video w-full rounded-2xl bg-slate-100 border grid place-items-center text-sm opacity-70">
-                    Trial highlights (sample video)
-                  </div>
-                </div>
+                <VideoBox caption="Trial highlights (sample)" />
               </div>
-            </Section>
+            </Card>
           )}
 
           {active==="what" && (
-            <Section title={copy.what.title}>
+            <Card title={copy.what.title}>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <p className="leading-relaxed">{copy.what.p}</p>
-                  <ul className="mt-4 space-y-2">{copy.what.points.map((b,i)=><li key={i}>• {b}</li>)}</ul>
+                  <p className="leading-relaxed text-slate-700">{copy.what.p}</p>
+                  <ul className="mt-4 space-y-2 text-slate-700">{copy.what.points.map((b,i)=><li key={i}>• {b}</li>)}</ul>
                 </div>
-                <div className="aspect-video w-full rounded-2xl bg-slate-100 border grid place-items-center text-sm opacity-70">
-                  Fundamentals (sample)
-                </div>
+                <VideoBox caption="Fundamentals (sample)" />
               </div>
-            </Section>
+            </Card>
           )}
 
           {active==="adv" && (
-            <Section title={copy.adv.title}>
+            <Card title={copy.adv.title}>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="grid gap-3">
                   {copy.adv.items.map((it,i)=>(
-                    <div key={i} className="p-4 rounded-2xl bg-slate-50 border">
-                      <div className="font-semibold">{it.h}</div>
-                      <div className="opacity-80 text-sm mt-1">{it.d}</div>
+                    <div key={i} className="p-4 rounded-2xl bg-white/80 border border-white/70 soft-shadow">
+                      <div className="font-semibold text-slate-900">{it.h}</div>
+                      <div className="opacity-80 text-sm mt-1 text-slate-600">{it.d}</div>
                     </div>
                   ))}
                 </div>
-                <div className="aspect-video w-full rounded-2xl bg-slate-100 border grid place-items-center text-sm opacity-70">
-                  Class snapshots (sample)
-                </div>
+                <VideoBox caption="Class snapshots (sample)" />
               </div>
-            </Section>
+            </Card>
           )}
 
           {active==="faq" && (
-            <Section title="FAQ">
+            <Card title="FAQ">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  {copy.faq.qa.map((qa, idx)=>(
-                    <div key={idx} className="p-4 rounded-2xl bg-white border shadow-sm">
+                  {copy.faq.qa.map((qa,idx)=>(
+                    <div key={idx} className="p-4 rounded-2xl bg-white/90 border border-white/70 soft-shadow">
                       <div className="font-semibold">Q. {qa.q}</div>
                       <div className="opacity-80 mt-1">A. {qa.a}</div>
                     </div>
                   ))}
                 </div>
-                <div className="aspect-video w-full rounded-2xl bg-slate-100 border grid place-items-center text-sm opacity-70">
-                  First-visit guide (sample)
-                </div>
+                <VideoBox caption="First-visit guide (sample)" />
               </div>
-            </Section>
+            </Card>
           )}
 
           {active==="enroll" && (
-            <Section title={copy.enroll.title}>
+            <Card title={copy.enroll.title}>
               <div className="grid md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 space-y-4">
-                  <div className="p-4 rounded-2xl bg-slate-50 border flex items-center justify-between">
+                  <div className="p-4 rounded-2xl bg-white/85 border border-white/70 soft-shadow flex items-center justify-between">
                     <div>
                       <div className="font-semibold">{copy.enroll.productTitle}</div>
                       <div className="text-sm opacity-80">{copy.enroll.price}</div>
                     </div>
-                    <button className="rounded-2xl px-4 py-2 bg-slate-900 text-white" onClick={addTrialToCart}>Add</button>
+                    <Primary onClick={addTrial}>Add</Primary>
                   </div>
 
-                  <form className="grid grid-cols-1 md:grid-cols-2 gap-3" onSubmit={e=>{e.preventDefault(); if(!form.consent) return alert('Please accept the consent.'); setSubmitted(true);}}>
-                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.guardian} value={form.guardian} onChange={e=>setForm({...form, guardian:e.target.value})}/>
-                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.student}  value={form.student}  onChange={e=>setForm({...form, student:e.target.value})}/>
-                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.age}      value={form.age}      onChange={e=>setForm({...form, age:e.target.value})}/>
-                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.phone}    value={form.phone}    onChange={e=>setForm({...form, phone:e.target.value})}/>
-                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.email}    value={form.email}    onChange={e=>setForm({...form, email:e.target.value})}/>
-                    <input className="border rounded-xl p-3" placeholder={copy.enroll.fields.day}      value={form.day}      onChange={e=>setForm({...form, day:e.target.value})}/>
-                    <textarea className="border rounded-xl p-3 md:col-span-2" placeholder={copy.enroll.fields.note} value={form.note} onChange={e=>setForm({...form, note:e.target.value})}></textarea>
+                  <form className="grid grid-cols-1 md:grid-cols-2 gap-3" onSubmit={(e)=>{e.preventDefault(); if(!form.consent) return alert('Please accept the consent.'); setSubmitted(true);}}>
+                    {field("Guardian Name","guardian")}
+                    {field("Student Name","student")}
+                    {field("Age","age")}
+                    {field("Phone","phone")}
+                    {field("Email","email")}
+                    {field("Preferred Days (e.g., Mon/Wed)","day")}
+                    <textarea className="border rounded-xl p-3 md:col-span-2" placeholder="Notes (optional)" value={form.note} onChange={e=>setForm({...form, note:e.target.value})}></textarea>
                     <label className="flex items-center gap-2 text-sm md:col-span-2">
                       <input type="checkbox" checked={form.consent} onChange={e=>setForm({...form, consent:e.target.checked})}/>
-                      {copy.enroll.fields.consent}
+                      I agree to the collection and use of my personal information.
                     </label>
                     <div className="flex gap-3 md:col-span-2">
-                      <button type="submit" className="rounded-2xl px-4 py-2 bg-slate-700 text-white">{copy.enroll.submit}</button>
-                      <a href="PAYMENT_LINK_HERE" target="_blank" className="rounded-2xl px-4 py-2 bg-slate-900 text-white"> {copy.enroll.pay} </a>
+                      <Secondary type="submit">Submit Enrollment</Secondary>
+                      <Primary as="a" href="PAYMENT_LINK_HERE" target="_blank">Pay Now</Primary>
                     </div>
                   </form>
 
                   {submitted && (
                     <div className="p-4 rounded-2xl bg-emerald-50 border text-emerald-700">
-                      {copy.enroll.success}
+                      Enrollment received! We'll text/email you after payment is complete.
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-3">
-                  <div className="aspect-video w-full rounded-2xl bg-slate-100 border grid place-items-center text-sm opacity-70">
-                    Intro video (sample)
-                  </div>
-                  <div className="p-4 rounded-2xl bg-slate-50 border text-sm opacity-80">
+                  <VideoBox caption="Intro video (sample)" />
+                  <div className="p-4 rounded-2xl bg-white/80 border border-white/70 text-sm text-slate-600">
                     Payment button opens Stripe Checkout. Replace with your live link.
                   </div>
                 </div>
               </div>
-            </Section>
+            </Card>
           )}
 
           {active==="contact" && (
-            <Section title={copy.contact.title}>
+            <Card title="Inquiry">
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="col-span-2 space-y-3">
-                  <p className="leading-relaxed">{copy.contact.lead}</p>
+                  <p className="leading-relaxed">Leave a quick message and we’ll reply shortly.</p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <a href="tel:+14842027808" className="rounded-2xl px-4 py-2 bg-slate-900 text-white text-center">Call</a>
-                    <a href="sms:+14847736282" className="rounded-2xl px-4 py-2 bg-slate-700 text-white text-center">Text</a>
-                    <a href="mailto:eagletkd2017@gmail.com" className="rounded-2xl px-4 py-2 border text-center">Email</a>
-                    <a href="#" onclick="alert('Scan the QR to open the online enrollment page. (Sample)'); return false;" className="rounded-2xl px-4 py-2 border text-center">QR</a>
+                    <Primary as="a" href="tel:+14842027808">Call</Primary>
+                    <Secondary as="a" href="sms:+14847736282">Text</Secondary>
+                    <Outline as="a" href="mailto:eagletkd2017@gmail.com">Email</Outline>
+                    <Outline as="a" href="#" onClick={(e)=>{e.preventDefault(); alert('Scan the QR to open the online enrollment page. (Sample)');}}>QR</Outline>
                   </div>
-                  <div className="p-4 rounded-2xl bg-slate-50 border">
+                  <div className="p-4 rounded-2xl bg-white/85 border border-white/70">
                     <div className="font-semibold mb-1">Address</div>
-                    <div className="opacity-80">{copy.contact.address}</div>
+                    <div className="opacity-80">Master Son’s Eagle Taekwondo, Chester Springs, PA</div>
                   </div>
                 </div>
                 <div className="col-span-1">
-                  <div className="aspect-video w-full rounded-2xl bg-white border grid place-items-center text-sm opacity-70">
+                  <div className="aspect-video w-full rounded-2xl bg-white border grid place-items-center text-sm opacity-70 soft-shadow">
                     QR CODE HERE
                   </div>
                   <p className="text-xs opacity-70 mt-2">Place your QR image here.</p>
                 </div>
               </div>
-            </Section>
+            </Card>
           )}
 
           {/* Footer */}
-          <div className="pt-2 flex flex-wrap items-center justify-between gap-3 opacity-80">
+          <footer className="pt-2 flex flex-wrap items-center justify-between gap-3 opacity-80">
             <div className="text-xs">© {new Date().getFullYear()} Master Son’s Eagle Taekwondo</div>
             <div className="text-xs">Enroll & pay when ready</div>
             {cart.length>0 && (
-              <div className="text-xs p-2 rounded-xl bg-white border shadow-sm">
+              <div className="text-xs p-2 rounded-xl bg-white/85 border border-white/70 soft-shadow">
                 Cart: {cart[0].name} — $ {cartTotal.toFixed(2)}
               </div>
             )}
-          </div>
+          </footer>
         </div>
-      );
+      )
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+    /* ---------- Small UI helpers ---------- */
+    const Card = ({title, right, children}) => (
+      <section className="rounded-3xl glass-card soft-shadow border border-white/70">
+        <div className="p-4 md:p-6 border-b border-white/60 flex items-center justify-between">
+          <h3 className="font-semibold text-xl md:text-2xl">{title}</h3>
+          <div className="flex items-center gap-2">{right}</div>
+        </div>
+        <div className="p-4 md:p-6">{children}</div>
+      </section>
+    );
+    const Primary = ({as='button', className='', ...p}) => React.createElement(as, {className:`px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold soft-shadow ${className}`, ...p});
+    const Secondary = ({as='button', className='', ...p}) => React.createElement(as, {className:`px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-900 text-white text-sm font-semibold soft-shadow ${className}`, ...p});
+    const Outline = ({as='a', className='', ...p}) => React.createElement(as, {className:`px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm font-semibold ${className}`, ...p});
+    const field = (ph, key) => (
+      <input className="border rounded-xl p-3" placeholder={ph}
+             value={undefined} onChange={()=>{}} data-key={key}
+             onInput={(e)=>window.__setForm(key, e.target.value)} />
+    );
+    // bind simple controlled inputs without rerenders
+    window.__setForm = (k,v)=>{ /* no-op placeholder; controlled above in Page */ };
+
+    const VideoBox = ({caption}) => (
+      <div className="space-y-2">
+        <div className="aspect-video w-full rounded-2xl bg-gradient-to-br from-slate-100 via-white to-slate-100 border grid place-items-center text-sm text-slate-500 soft-shadow">
+          {caption}
+        </div>
+      </div>
+    );
+
+    /* ---------- Icons (tiny inline SVG) ---------- */
+    function TrialIcon(){ return (<svg width="18" height="18" viewBox="0 0 24 24" className="text-white"><path fill="currentColor" d="M3 5h18v2H3V5zm2 4h14v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V9zm4 2v8h6v-8H9z"/></svg>); }
+    function SunIcon(){ return (<svg width="18" height="18" viewBox="0 0 24 24" className="text-white"><path fill="currentColor" d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0 4a1 1 0 0 1-1-1v-1h2v1a1 1 0 0 1-1 1zM4 13H3a1 1 0 1 1 0-2h1v2zm17 0h-1v-2h1a1 1 0 1 1 0 2zM6.22 5.22a1 1 0 0 1 1.41 0l.71.71-1.41 1.41-.71-.71a1 1 0 0 1 0-1.41zM16.66 6.34l.71-.71a1 1 0 1 1 1.41 1.41l-.71.71-1.41-1.41z"/></svg>); }
+    function ShieldIcon(){ return (<svg width="18" height="18" viewBox="0 0 24 24" className="text-white"><path fill="currentColor" d="M12 2l7 4v6c0 5-3.5 9.74-7 10-3.5-.26-7-5-7-10V6l7-4z"/></svg>); }
+    function QIcon(){ return (<svg width="18" height="18" viewBox="0 0 24 24" className="text-white"><path fill="currentColor" d="M12 2a10 10 0 1 0 5.65 18.32l2.51 1.45-1.45-2.51A10 10 0 0 0 12 2zm1 15h-2v-2h2v2zm1.07-7.75-.9.92A1.5 1.5 0 0 0 12.5 12h-1v-1a3 3 0 0 1 .88-2.12l1.24-1.26A1.5 1.5 0 1 0 11 6a1 1 0 0 1-2 0 3.5 3.5 0 1 1 5.07 4.25z"/></svg>); }
+    function CardIcon(){ return (<svg width="18" height="18" viewBox="0 0 24 24" className="text-white"><path fill="currentColor" d="M3 5h18a2 2 0 0 1 2 2v2H1V7a2 2 0 0 1 2-2zm20 6v4a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-4h22z"/></svg>); }
+    function ChatIcon(){ return (<svg width="18" height="18" viewBox="0 0 24 24" className="text-white"><path fill="currentColor" d="M21 6h-2V4a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H3a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h4l4 3 4-3h6a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zM7 4h10v2H7V4z"/></svg>); }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Page/>);
   </script>
 </body>
 </html>
